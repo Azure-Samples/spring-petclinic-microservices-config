@@ -10,10 +10,11 @@ server:
 spring:
   sql:
     init:
-      schema-locations: classpath*:db/hsqldb/schema.sql
-      data-locations: classpath*:db/hsqldb/data.sql
       mode: always
       platform: hsqldb
+  sleuth:
+    sampler:
+      probability: 1.0
   cloud:
     config:
       # Allow the microservices to override the remote properties with their own System properties or config file
@@ -22,7 +23,6 @@ spring:
       override-none: true
   jpa:
     open-in-view: false
-    show-sql: true
     hibernate:
       ddl-auto: none
   jmx:
@@ -80,29 +80,35 @@ spring:
     activate:
       on-profile: mysql
   datasource:
+    schema: classpath*:db/mysql/schema.sql
+    data: classpath*:db/mysql/data.sql
     url: jdbc:mysql://${MYSQL_SERVER_FULL_NAME}:3306/${MYSQL_DATABASE_NAME}?useSSL=false
     username: ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
     password: ${MYSQL_SERVER_ADMIN_PASSWORD}
+    initialization-mode: ALWAYS
   sql:
     init:
-      schema-locations: classpath*:db/mysql/schema.sql
-      data-locations: classpath*:db/mysql/data.sql
       mode: always
-
+      platform: mysql
 ---
 spring:
   config:
     activate:
       on-profile: passwordless
+  datasource:
+    schema: classpath*:db/mysql/schema.sql
+    data: classpath*:db/mysql/data.sql
     # url and username are injected by the service configuration as env vars
     azure:
       passwordless-enabled: true
   sql:
     init:
-      schema-locations: classpath*:db/mysql/schema.sql
-      data-locations: classpath*:db/mysql/data.sql
       mode: always
-
+      platform: mysql
+  cloud:
+    azure:
+      compatibility-verifier.enabled: false
+      
 ---
 spring:
   config:
